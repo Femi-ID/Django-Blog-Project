@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    {% extends 'blog/base.html' %}
+    {% load blog_tags %}
+
+    {% block title %} Search {% endblock %}
+
+    {% block content %}
+        {% if query %}
+            <h1> Posts containing "{{query}}":</h1>
+            <hr>
+            <h3>
+                {% with results.count as total_results %}
+                    Found {{ total_results }} result{{ total_result|pluralize }}
+                {% endwith %}
+            </h3>
+
+            {% for post in results %}
+                <h4><a href="{{ post.get_absolute_url}}">{{ post.title }}</a></h4>
+                {{ post.body|markdown|truncatewords_html:10 }}
+            {% empty %}
+                <p><a href="{% url 'blog:post_search' %}">Search again</a></p>
+                <span ><a href="{% url 'blog:post_list' %}">Home</a></span>
+            {% endfor %}
+
+            <span ><a href="{% url 'blog:post_list' %}">Home</a></span>
+
+
+        {% else %}
+            <h1>Search for posts</h1>
+
+            <form method="get">
+                {{ form.as_p }}
+                {% csrf_token %}
+                <input value="submit" name="search" type="submit">
+            </form>
+            <br>
+            <span ><a href="{% url 'blog:post_list' %}">Home</a></span>
+        {% endif %}
+    {% endblock %}
+</body>
+</html>
